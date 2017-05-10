@@ -32,10 +32,16 @@ shinyServer(function(input, output, session) {
   bikeCount <- reactive({
     count_hourly_tall %>%
       subset(hour(hour) %in% as.numeric(input$hourOfDay)) %>%
-      subset(wday(hour) %in% input$dayOfWeek)
+      subset(wday(hour, label=TRUE) %in% input$dayOfWeek) %>%
+      subset(month(hour, label=TRUE) %in% input$monthOfYear)
   })
   observe({
     print((as.numeric(input$hourOfDay)))
+    print(input$dayOfWeek)
+    input$hourOfDay
+    input$dayOfWeek
+    input$monthOfYear
+    # updateCheckboxGroupInput(session,'hourOfDay')
   })
   # 
   #  observe({
@@ -72,9 +78,10 @@ shinyServer(function(input, output, session) {
     # graph <- bikeCount() 
   
     # use plotly to plot.
-    plot2 <- ggplot(bikeCount(), aes(x=month(hour,label=TRUE), y=count)) + geom_bar(stat='identity') + facet_grid(location~.)
-    ggplotly(plot2) %>%
-      layout(annotations = 'good')
+    plot2 <- ggplot(bikeCount(), aes(x=date(hour), y=count)) + geom_bar(stat='identity') + facet_grid(location~.)
+    ggplotly(plot2)
+    # %>%
+      # layout(annotations = 'good')
   })
   # plotlyOutput('graph')
   

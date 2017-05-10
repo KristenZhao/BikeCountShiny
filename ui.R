@@ -51,14 +51,15 @@ dashboardPage(
                 column(width = 4,
                        box(width = NULL,
                            checkboxGroupInput('hourOfDay', 'Select the hours of day you are interested', 
-                                              choices = c(0:23), selected = 8, inline = TRUE)
+                                              choices = c(0:23), selected = c(0:23), inline = TRUE)
                            )
                        ),
                 column(width = 4,
                        box(width = NULL,
                            checkboxGroupInput('dayOfWeek', 'Select the days of week you are interested',
                                               choices = c('Sun','Mon','Tues','Wed','Thurs','Fri','Sat'),
-                                              selected = NULL, inline = FALSE)
+                                              selected = c('Sun','Mon','Tues','Wed','Thurs','Fri','Sat'), 
+                                                           inline = FALSE)
                            )
                        ),
                 column(width = 4,
@@ -81,3 +82,4 @@ dashboardPage(
       )
 )
 )
+

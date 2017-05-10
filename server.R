@@ -30,12 +30,12 @@ count_hourly_tall <- readRDS('count_tall.rds')
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
   bikeCount <- reactive({
-    count_hourly_tall 
-    # %>%
-      # subset(hour(hour) == unlist(input$hourOfDay)) 
+    count_hourly_tall %>%
+      subset(hour(hour) %in% as.numeric(input$hourOfDay)) %>%
+      subset(wday(hour) %in% input$dayOfWeek)
   })
   observe({
-    print(as.numeric(input$hourOfDay))
+    print((as.numeric(input$hourOfDay)))
   })
   # 
   #  observe({

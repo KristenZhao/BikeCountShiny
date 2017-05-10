@@ -31,14 +31,20 @@ dashboardPage(
       tabItem(tabName = "map",
               fluidRow(
                 column(width = 12,
-                       box(width = NULL,
-                           leafletOutput("bike_count_map", height = 600))
+                       box(width = NULL, title = 'Bike counter locations as shown in blue circles',
+                           footer = 'Circle sizes are in proportion to the ratio between total traffic counts at two locations.',
+                           leafletOutput("bike_count_map", height = 200))
                 )
               ),
               fluidRow(
                 column(width= 12,
                        box(width = NULL,
                            plotlyOutput('dailyCount')))
+              ),
+              fluidRow(
+                column(width=12,
+                       box(width = NULL, footer = 'retrieved from http://www.aos.wisc.edu/~sco/clim-history/stations/msn/msn-tts-2016.gif',
+                           tags$img(src='2016MadisonWeather.gif',width = 700)))
               )
       ),
       tabItem(tabName = "graphs",
@@ -66,9 +72,7 @@ dashboardPage(
                         box(width = NULL,
                             checkboxGroupInput('monthOfYear', 'Select the months of year you are interested',
                                                choices = c('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug',
-                                                           'Sep','Oct','Nov','Dec'), inline = TRUE, selected = 
-                                                 'Jan'
-                                               )
+                                                           'Sep','Oct','Nov','Dec'), inline = TRUE, selected = 'Jan')
                             )
                        )
                    )

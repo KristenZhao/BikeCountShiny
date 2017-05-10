@@ -16,6 +16,7 @@ library(leaflet)
 library(ggplot2)
 library(plotly)
 library(lubridate)
+library(scales)
 
 #checkboxgroupinput()
 #plotOutput()
@@ -43,70 +44,30 @@ shinyServer(function(input, output, session) {
     input$monthOfYear
     # updateCheckboxGroupInput(session,'hourOfDay')
   })
-  # 
-  #  observe({
-  #    input$month #any change in ggplot will reflect on map
-  # 
-  #    updateDateRangeInput(session, "date2",
-  #                         "Select dates to visualize.",
-  #                         start = input$date2[1],
-  #                         end = input$date2[2],
-  #                         min = min(bike_philly$UPDATED), max = max(bike_philly$UPDATED))
-  #  })
-  # 
-  #  observe({
-  #    input$CNTDIR
-  #    updateSelectInput(session,'CNTDIR','Choose a direction',
-  #                      choices = c('all','both','east','north','south','west'))
-  #  })
 
   output$bike_count_map <- renderLeaflet({
-    bikeCount() %>%
       leaflet() %>%
       setView(lng = "-89.402436", lat = "43.068874", zoom = 14) %>%
       addTiles() %>%
-      addCircleMarkers(lng=-89.387366, lat=43.066828, popup='North Shore Drive Bike Counter') %>%
-      addCircleMarkers(lng=-89.412087, lat=43.068021, popup='Monroe Street Bike Counter')
+      addCircleMarkers(lng=-89.387366, lat=43.066828, popup='North Shore Drive Bike Counter, total traffic: 577,274', 
+                       radius = sum(subset(count_hourly_tall, count_hourly_tall$location %in% 'capital')$count*0.00003)) %>%
+      addCircleMarkers(lng=-89.412087, lat=43.068021, popup='Monroe Street Bike Counter, total traffic: 394,690',
+                       radius = sum(subset(count_hourly_tall,count_hourly_tall$location %in% 'monroe')$count*0.00003))
   })
 
   output$dailyCount <- renderPlotly({
-    plot1 <- ggplot(count_hourly_tall, aes(x=date(hour),y=count)) + geom_bar(stat='identity') + facet_grid(location~.)
-    ggplotly(plot1) %>% layout(annotations = 'daily count of bike traffic for Capital and Monroe Counter Locations')
+    plot1 <- ggplot(count_hourly_tall, aes(x=date(hour),y=count)) + geom_bar(stat='identity') + 
+      facet_grid(location~.) + labs(title = 'Madison 2016 Daily Bike Traffic Pattern', 
+                                    x="",y="Bike Counts") + scale_x_date(labels = date_format("%m/%d"),
+                                                                         breaks = date_breaks("4 weeks")) + theme_gray() 
+    ggplotly(plot1) 
   })
   
   output$graph <- renderPlotly({
-    # graph <- bikeCount() 
-  
     # use plotly to plot.
-    plot2 <- ggplot(bikeCount(), aes(x=date(hour), y=count)) + geom_bar(stat='identity') + facet_grid(location~.)
+    plot2 <- ggplot(bikeCount(), aes(x=date(hour), y=count)) + geom_bar(stat='identity') + facet_grid(location~.) +
+      labs(title = 'Traffic Count for Selected Time Ranges', x="",y="Bike Counts") + theme_gray()
     ggplotly(plot2)
-    # %>%
-      # layout(annotations = 'good')
   })
-  # plotlyOutput('graph')
-  
-  # output$count_by_muni_per_dir <- renderPlot({
-  #   count_per_muni2 <- filtered_bike() %>%
-  #     select(-UPDATED) %>%
-  #     group_by(MUN_NAME) %>%
-  #     summarize(count_sum2 = sum(AADB))
-  # 
-  #   ggplot(count_per_muni2, aes(reorder(MUN_NAME,-count_sum), count_sum)) + 
-  #     geom_bar(stat = 'identity',aes(fill=MUN_NAME)) +
-  #     labs(title = 'Bike Counts per Municipalities', x="Municipality names",y="Bike counts") +
-  #     theme_gray() + theme(axis.text.x = element_text(angle = 45, hjust = 1),legend.position="none")
-  # })
-  # 
-  # output$total_count <- renderText({
-  #   as.character(sum(filtered_bike()$AADB))
-  # })
-  # 
-  # output$popular_area <- renderText({
-  #   names(tail(sort(table(filtered_bike()$TOLMT)), 1))
-  #   #filtered_bike()$MUN_NAME[which(filtered_bike()$),]
-  # })
-  # 
-  # output$muni <- renderText({
-  #   names(tail(sort(table(filtered_bike()$MUN_NAME)), 1))
-  })
-# })
+})
+
